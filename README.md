@@ -13,6 +13,13 @@ npm run build    # dist/ — also opens straight from file://, just double-click
 npm test         # headless simulation smoke test (24 checks)
 ```
 
+## Saving
+
+Three save slots, plus **Download this zoo as a file** / **Load a zoo from a file** so a zoo can
+leave the browser entirely — slots live in `localStorage`, which clearing site data wipes and which
+doesn't follow you to another machine. The game autosaves to Slot 1 every 90 seconds, and
+**Continue** on the title screen picks up whichever slot was saved most recently.
+
 ## Modes
 
 The game opens on a title screen with a live, simulated zoo drifting behind it. From there:

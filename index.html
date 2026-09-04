@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Taronga Tycoon</title>
+  <link rel="icon" href="/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+
+  <!-- top status bar -->
+  <div id="topbar" class="frame">
+    <img id="brand" src="/logo.png" alt="Taronga Tycoon" />
+    <div class="stat stat-cash"><span class="stat-label">Funds</span><span id="hud-cash" class="stat-value">$0</span></div>
+    <div class="stat"><span class="stat-label">Guests</span><span id="hud-guests" class="stat-value">0</span></div>
+    <div class="stat"><span class="stat-label">Rating</span><span id="hud-rating" class="stat-value">0</span></div>
+    <div class="stat"><span class="stat-label">Date</span><span id="hud-date" class="stat-value">Jan 1</span></div>
+
+    <div class="divider"></div>
+    <div class="btn-group">
+      <button id="btn-pause" class="btn icon" data-icon="pause" title="Pause (Space)"></button>
+      <button id="btn-play" class="btn icon" data-icon="play" title="Normal speed (1)"></button>
+      <button id="btn-med" class="btn icon" data-icon="play2" title="Double speed (2)"></button>
+      <button id="btn-fast" class="btn icon" data-icon="play3" title="Triple speed (3)"></button>
+    </div>
+    <div class="divider"></div>
+    <div class="btn-group">
+      <button id="btn-goals" class="btn" data-icon="goals" title="Scenario objectives">Goals</button>
+      <button id="btn-alerts" class="btn" data-icon="alerts" title="Problems needing attention">Alerts<span id="alert-badge"></span></button>
+      <button id="btn-zoo" class="btn" data-icon="zoo" title="Zoo overview and admission price">Zoo</button>
+      <button id="btn-staff" class="btn" data-icon="staff" title="Hire and manage staff">Staff</button>
+      <button id="btn-finance" class="btn" data-icon="finance" title="Finances">Finance</button>
+      <button id="btn-animals" class="btn" data-icon="animal" title="All animals">Animals</button>
+      <button id="btn-guests" class="btn" data-icon="guests" title="All guests">Guests</button>
+      <button id="btn-log" class="btn" data-icon="log" title="Messages">Log</button>
+    </div>
+    <div class="divider"></div>
+    <div class="btn-group">
+      <button id="btn-save" class="btn icon" data-icon="save" title="Save game"></button>
+      <button id="btn-new" class="btn icon" data-icon="newgame" title="New zoo"></button>
+      <button id="btn-sound" class="btn icon" data-icon="soundOn" title="Sound on/off"></button>
+      <button id="btn-music" class="btn icon" data-icon="musicOn" title="Music on/off"></button>
+      <button id="btn-help" class="btn icon" data-icon="help" title="How to play"></button>
+    </div>
+  </div>
+
+  <!-- build tools -->
+  <div id="toolbar" class="frame"></div>
+  <div id="submenu" class="frame"></div>
+
+  <!-- floating windows mount here -->
+  <div id="windows"></div>
+
+  <!-- minimap + view controls -->
+  <div id="viewpanel" class="frame">
+    <canvas id="minimap" width="150" height="150"></canvas>
+    <div id="view-controls">
+      <button id="btn-rot-l" class="btn icon" data-icon="rotL" title="Rotate view left (Q)"></button>
+      <button id="btn-zoom-out" class="btn icon" data-icon="zoomOut" title="Zoom out (−)"></button>
+      <button id="btn-zoom-in" class="btn icon" data-icon="zoomIn" title="Zoom in (+)"></button>
+      <button id="btn-rot-r" class="btn icon" data-icon="rotR" title="Rotate view right (E)"></button>
+    </div>
+  </div>
+
+  <!-- context strip -->
+  <div id="statusbar" class="frame">
+    <span id="status-tool">Inspect</span>
+    <span class="sep">·</span>
+    <span id="status-tile">—</span>
+    <span id="status-cost"></span>
+  </div>
+
+  <div id="ticker"></div>
+
+  <!-- guided first run -->
+  <div id="tutorial">
+    <div class="tut-head">
+      <span class="tut-step" id="tut-step">1 / 9</span>
+      <span class="tut-title" id="tut-title"></span>
+      <span class="tut-skip" id="tut-skip">skip ✕</span>
+    </div>
+    <p class="tut-body" id="tut-body"></p>
+    <p class="tut-hint" id="tut-hint"></p>
+    <button class="btn wide" id="tut-next">Got it</button>
+  </div>
+
+  <!-- title screen -->
+  <div id="menu">
+    <div class="menu-inner">
+      <img id="menu-logo" src="/logo.png" alt="Taronga Tycoon" />
+      <p class="menu-tag">Build the zoo. Keep them thriving. Send them home.</p>
+      <div class="menu-buttons" id="menu-main">
+        <button class="menu-btn" id="m-continue">Continue<small>Pick up your saved zoo</small></button>
+        <button class="menu-btn primary" id="m-play">Choose a Zoo<small>Start a new zoo, or rebuild a real one</small></button>
+        <button class="menu-btn" id="m-sandbox">Sandbox<small>Everything unlocked, no deadline</small></button>
+        <label class="guide-toggle" id="m-guide">
+          <input type="checkbox" id="m-guide-box" checked>
+          <span><b>Guide me as I play</b><small>Nine steps that walk you through your first zoo</small></span>
+        </label>
+      </div>
+      <div id="menu-sites"></div>
+      <div class="menu-foot">
+        <button class="btn icon" id="m-sound" data-icon="soundOn" title="Sound on/off"></button>
+        <span>An isometric zoo tycoon · drag to pan · Q / E to rotate</span>
+      </div>
+    </div>
+  </div>
+  <div id="outcome"><div class="card">
+    <h2 id="outcome-title"></h2>
+    <p id="outcome-text"></p>
+    <button class="btn wide" id="outcome-new">Start a new zoo</button>
+  </div></div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

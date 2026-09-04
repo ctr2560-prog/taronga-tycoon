@@ -1,0 +1,56 @@
+<script>localStorage.clear()</script>
+<script type="module">
+  await new Promise(r => setTimeout(r, 500));
+  document.getElementById('m-play').click();        // leave the title screen
+  await new Promise(r => setTimeout(r, 200));
+  document.querySelector('[data-sandbox]').click();
+  await new Promise(r => setTimeout(r, 250));
+  window.__tt.game.tiles.forEach(t => { if (t.terrain === 'water') t.terrain = 'grass'; });
+  const { game, cam } = window.__tt;
+  const x0=18,y0=18,x1=25,y1=24;
+  game.cash=500000;
+  game.buildWallRun(game.wallRun(x0,y0,0,x1,y0),false,'stone');
+  game.buildWallRun(game.wallRun(x0,y1,2,x1,y1),false,'glass');
+  game.buildWallRun(game.wallRun(x0,y0,3,x0,y1),false,'glass');
+  game.buildWallRun(game.wallRun(x1,y0,1,x1,y1),false,'stone');
+  game.buildWallRun([game.edgeRef(x0+3,y1,2)],true,'glass');
+  for(let x=x0;x<=x1;x++)for(let y=y0;y<=y1;y++){
+    if(x<x0+3&&y>y0+3) game.paintTerrain(x,y,'water');
+    else if((x+y)%5===0) game.paintTerrain(x,y,'dirt');
+  }
+  game.buildScenery(x0+4,y0+1,'tree'); game.buildScenery(x0+6,y0+1,'climb');
+  game.buildScenery(x0+6,y0+3,'logs'); game.buildScenery(x0+2,y0+1,'rock');
+  game.buildScenery(x0+4,y0+4,'shelter'); game.buildScenery(x0+2,y0+3,'puzzle');
+  game.buildScenery(x0+7,y0+4,'feeder'); game.buildScenery(x0+5,y0+5,'waterer');
+  game.buildScenery(22,y1+2,'bench'); game.buildScenery(20,y1+3,'bin'); game.buildScenery(24,y1+2,'lamp');
+  game.buildScenery(21,y1+3,'sign'); game.buildScenery(23,y1+3,'podium');
+  for(let y=47;y>=y1+1;y--) game.buildPath(24,y);
+  for(let x=24;x>=x0-1;x--) game.buildPath(x,y1+1);
+  for(let y=y1+1;y>=y0-1;y--) game.buildPath(x0-1,y);
+  game.buildShop(23,y1+2,'food'); game.buildShop(21,y1+2,'drink'); game.buildShop(19,y1+2,'toilet');
+  game.buildScenery(22,y1+2,'flowers'); game.buildScenery(20,y1+2,'flowers');
+  // transport goes in after the paths exist — stations must touch one
+  const mono = game.addStation('monorail', 25, 44, -1);
+  game.addStation('monorail', 25, 30, mono);
+  const cab = game.addStation('cablecar', 18, 24, -1);
+  game.addStation('cablecar', 18, 18, cab);
+  const trn = game.addStation('train', 23, 36, -1);
+  game.addStation('train', 19, 27, trn);
+
+  game.rating=900;   // demo: unlock the exotics up front
+  const h=game.tile(x0+5,y0+2).habitatId;
+  for(let i=0;i<2;i++) game.buyAnimal('kangaroo',h);
+  game.buyAnimal('emu',h); game.buyAnimal('giraffe',h); game.buyAnimal('zebra',h);
+  game.buyAnimal('tiger',h); game.buyAnimal('elephant',h); game.buyAnimal('meerkat',h);
+  game.buyAnimal('gorilla',h); game.buyAnimal('penguin',h);
+  game.hireStaff('keeper'); game.hireStaff('keeper');
+  game.hireStaff('caretaker'); game.hireStaff('vet'); game.hireStaff('educator');
+  game.speed=3; game.admission=8;
+  for(let i=0;i<3000;i++) game.update(1/30);
+  game.speed=1;
+  const p = new URLSearchParams(location.search);
+  cam.tx=22; cam.ty=29; cam.zoom=1.15; cam.rot=Number(p.get('rot')||0);
+  if(p.get('win')) for(const w of p.get('win').split(',')) document.getElementById('btn-'+w).click();
+  if(p.get('tool')) document.querySelectorAll('#toolbar .tool-btn')[Number(p.get('tool'))].click();
+  document.title='TT demo ready';
+</script>

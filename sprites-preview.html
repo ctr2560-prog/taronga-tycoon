@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Sprite sheet</title>
+<style>
+  body { background:#5a9e4b; margin:0; font-family:monospace; }
+  canvas { image-rendering: pixelated; display:block; }
+</style></head>
+<body>
+<canvas id="c" width="1500" height="1250"></canvas>
+<script type="module">
+  // Dev-only sheet for eyeballing animal artwork at scale. Not part of the game.
+  import { buildSprites, sprite } from '/src/sprites.ts';
+  import { SPECIES, BARRIERS, SCENERY } from '/src/data.ts';
+
+  buildSprites();
+  const g = document.getElementById('c').getContext('2d');
+  g.imageSmoothingEnabled = false;
+  const Z = 3;
+
+  // a guest and a tile for scale reference
+  const rows = [...SPECIES.map(s => s.id), '__guest'];
+  let x = 20, y = 40, col = 0;
+  g.fillStyle = '#1d1409';
+  g.font = '13px monospace';
+
+  for (const id of rows) {
+    const isGuest = id === '__guest';
+    const a = isGuest ? sprite('guest_0_0_0') : sprite(`animal_${id}_0`);
+    const b = isGuest ? sprite('guest_0_0_1') : sprite(`animal_${id}_1`);
+    const label = isGuest ? 'GUEST (scale)' : SPECIES.find(s => s.id === id).name;
+
+    // tile underneath, so proportion to the world is obvious
+    g.drawImage(sprite('grass'), x, y + 120 - 32 * 1);
+    g.save();
+    g.translate(x, y);
+    g.scale(Z, Z);
+    g.drawImage(a, 0, (120 / Z) - a.height);
+    g.drawImage(b, a.width + 4, (120 / Z) - b.height);
+    g.restore();
+    g.fillStyle = '#1d1409';
+    g.fillText(label, x, y + 138);
+    g.fillText(`${a.width - 2}x${a.height - 2}px`, x, y + 152);
+
+    col++;
+    x += 240;
+    if (col % 6 === 0) { x = 20; y += 190; }
+  }
+
+  // barriers, each with its gate, and the enrichment items
+  x = 20; y += 230;
+  g.fillStyle = '#1d1409';
+  g.fillText('BARRIERS + GATES', x, y - 14);
+  for (const b of BARRIERS) {
+    g.save(); g.translate(x, y); g.scale(2, 2);
+    g.drawImage(sprite('grass'), 0, 30);
+    g.drawImage(sprite(`wall_${b.id}_2`), 0, 0);
+    g.drawImage(sprite('grass'), 70, 30);
+    g.drawImage(sprite(`gate_${b.id}_2`), 70, 0);
+    g.restore();
+    g.fillStyle = '#1d1409';
+    g.fillText(`${b.name}  str ${b.strength}/3`, x, y + 145);
+    x += 280;
+  }
+  x = 20; y += 200;
+  g.fillText('ENRICHMENT', x, y - 14);
+  for (const sc of SCENERY) {
+    const img = sprite(sc.id);
+    g.save(); g.translate(x, y); g.scale(2, 2);
+    g.drawImage(sprite('grass'), 0, 26);
+    g.drawImage(img, 16 - img.width / 2, 42 - img.height);
+    g.restore();
+    g.fillStyle = '#1d1409';
+    g.fillText(sc.name, x, y + 105);
+    x += 145;
+  }
+  document.title = 'sheet ready';
+</script>
+</body>
+</html>
